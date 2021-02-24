@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { Form, FastDatePicker, FastInput, FastCurrencyInput } from 'components/common/form';
 import { useFormikContext } from 'formik';
@@ -11,22 +11,12 @@ import {
   dateEnteredMarket,
   DisposalWorkflows,
   onTransferredWithinTheGreTooltip,
-  IProperty,
-  disposeSubdivisionWarning,
-  IParentParcel,
 } from '../../common';
 import './SurplusPropertyListForm.scss';
 import _ from 'lodash';
-import GenericModal, { ModalSize } from 'components/common/GenericModal';
+import GenericModal from 'components/common/GenericModal';
 import TooltipIcon from 'components/common/TooltipIcon';
 import { SurplusPropertyListApprovalForm } from '..';
-import styled from 'styled-components';
-import { FaExclamationTriangle } from 'react-icons/fa';
-import variables from '_variables.module.scss';
-import { LinkList, ILinkListItem } from 'components/common/LinkList';
-import { useLocation } from 'react-router-dom';
-import { pidFormatter } from 'features/properties/components/forms/subforms/PidPinForm';
-import queryString from 'query-string';
 
 interface ISurplusPropertyListFormProps {
   isReadOnly?: boolean;
@@ -63,12 +53,6 @@ const primaryButton = (status?: string): string => {
   }
 };
 
-const FloatCheck = styled(FaExclamationTriangle)`
-  margin: 1em;
-  color: ${variables.accentColor};
-  float: left;
-`;
-
 /**
  * Form component of SurplusPropertyListForm. TODO: add button click functionality.
  * @param param0 isReadOnly disable editing
@@ -86,59 +70,30 @@ const SurplusPropertyListForm = ({
 }: ISurplusPropertyListFormProps) => {
   const formikProps = useFormikContext<IProject>();
   const [dispose, setDispose] = useState(false);
-  const location = useLocation();
-  const { values } = formikProps;
-  const cipConditionalTasks = _.filter(values.tasks, {
+  const cipConditionalTasks = _.filter(formikProps.values.tasks, {
     statusCode: ReviewWorkflowStatus.ContractInPlaceConditional,
   });
-  const cipUnconditionalTasks = _.filter(values.tasks, {
+  const cipUnconditionalTasks = _.filter(formikProps.values.tasks, {
     statusCode: ReviewWorkflowStatus.ContractInPlaceUnconditional,
   });
 
-  const mainBtn = primaryButton(values.statusCode);
-  const subdivisions =
-    values.properties.filter((property: IProperty) => property.propertyTypeId === 2) ?? [];
-  const parentParcels = _.flatten(
-    _.uniqBy(
-      subdivisions.map(s => s.parcels ?? []),
-      'pid',
-    ),
-  );
-
-  const linkListItems = useMemo<ILinkListItem[]>(
-    () =>
-      parentParcels.map(
-        (parcel: IParentParcel): ILinkListItem => ({
-          key: parcel.id,
-          label: `PID ${pidFormatter(parcel.pid ?? '')}`,
-          pathName: '/mapview',
-          search: queryString.stringify({
-            ...queryString.parse(location.search),
-            sidebar: true,
-            disabled: true,
-            loadDraft: false,
-            parcelId: parcel.id,
-          }),
-        }),
-      ),
-    [location.search, parentParcels],
-  );
+  const mainBtn = primaryButton(formikProps.values.statusCode);
 
   return (
     <Container fluid className="SurplusPropertyListForm">
-      {values.statusCode !== ReviewWorkflowStatus.Cancelled &&
-        values.statusCode !== ReviewWorkflowStatus.Disposed && (
+      {formikProps.values.statusCode !== ReviewWorkflowStatus.Cancelled &&
+        formikProps.values.statusCode !== ReviewWorkflowStatus.Disposed && (
           <Form.Row>
             <Form.Label column md={3}>
               Change the Status
             </Form.Label>
             <Form.Group>
-              {values.workflowCode === DisposalWorkflows.Erp && (
+              {formikProps.values.workflowCode === DisposalWorkflows.Erp && (
                 <Button
                   disabled={
                     isReadOnly ||
-                    !values.clearanceNotificationSentOn ||
-                    !values.requestForSplReceivedOn
+                    !formikProps.values.clearanceNotificationSentOn ||
+                    !formikProps.values.requestForSplReceivedOn
                   }
                   onClick={onClickProceedToSPL}
                 >
@@ -146,17 +101,20 @@ const SurplusPropertyListForm = ({
                 </Button>
               )}
 
-              {values.statusCode === ReviewWorkflowStatus.PreMarketing && (
+              {formikProps.values.statusCode === ReviewWorkflowStatus.PreMarketing && (
                 <Button
                   variant="secondary"
-                  disabled={isReadOnly || values.statusCode !== ReviewWorkflowStatus.PreMarketing}
+                  disabled={
+                    isReadOnly ||
+                    formikProps.values.statusCode !== ReviewWorkflowStatus.PreMarketing
+                  }
                   onClick={onClickRemoveFromSPL}
                 >
                   Remove from SPL
                 </Button>
               )}
-              {values.statusCode !== ReviewWorkflowStatus.PreMarketing &&
-                values.workflowCode === DisposalWorkflows.Spl && (
+              {formikProps.values.statusCode !== ReviewWorkflowStatus.PreMarketing &&
+                formikProps.values.workflowCode === DisposalWorkflows.Spl && (
                   <Button
                     variant={mainBtn === 'PM' ? 'primary' : 'secondary'}
                     disabled={isReadOnly}
@@ -165,8 +123,8 @@ const SurplusPropertyListForm = ({
                     Pre-Marketing
                   </Button>
                 )}
-              {values.statusCode !== ReviewWorkflowStatus.OnMarket &&
-                values.workflowCode === DisposalWorkflows.Spl && (
+              {formikProps.values.statusCode !== ReviewWorkflowStatus.OnMarket &&
+                formikProps.values.workflowCode === DisposalWorkflows.Spl && (
                   <Button
                     variant={mainBtn === 'M' ? 'primary' : 'secondary'}
                     disabled={isReadOnly}
@@ -175,8 +133,8 @@ const SurplusPropertyListForm = ({
                     On the Market
                   </Button>
                 )}
-              {(values.statusCode === ReviewWorkflowStatus.PreMarketing ||
-                values.statusCode === ReviewWorkflowStatus.OnMarket) && (
+              {(formikProps.values.statusCode === ReviewWorkflowStatus.PreMarketing ||
+                formikProps.values.statusCode === ReviewWorkflowStatus.OnMarket) && (
                 <Button
                   variant={mainBtn === 'CIP' ? 'primary' : 'secondary'}
                   disabled={isReadOnly}
@@ -186,9 +144,10 @@ const SurplusPropertyListForm = ({
                 </Button>
               )}
 
-              {(values.statusCode === ReviewWorkflowStatus.PreMarketing ||
-                values.statusCode === ReviewWorkflowStatus.OnMarket ||
-                values.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional) && (
+              {(formikProps.values.statusCode === ReviewWorkflowStatus.PreMarketing ||
+                formikProps.values.statusCode === ReviewWorkflowStatus.OnMarket ||
+                formikProps.values.statusCode ===
+                  ReviewWorkflowStatus.ContractInPlaceConditional) && (
                 <Button
                   variant={mainBtn === 'CIP' ? 'primary' : 'secondary'}
                   disabled={isReadOnly}
@@ -197,16 +156,19 @@ const SurplusPropertyListForm = ({
                   Unconditional
                 </Button>
               )}
-              {(values.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional ||
-                values.statusCode === ReviewWorkflowStatus.ContractInPlaceUnconditional) && (
+              {(formikProps.values.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional ||
+                formikProps.values.statusCode ===
+                  ReviewWorkflowStatus.ContractInPlaceUnconditional) && (
                 <Button
                   variant={mainBtn === 'D' ? 'primary' : 'secondary'}
                   disabled={
                     isReadOnly ||
-                    (values.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional &&
+                    (formikProps.values.statusCode ===
+                      ReviewWorkflowStatus.ContractInPlaceConditional &&
                       _.filter(cipConditionalTasks, { isCompleted: false, isOptional: false })
                         .length !== 0) ||
-                    (values.statusCode === ReviewWorkflowStatus.ContractInPlaceUnconditional &&
+                    (formikProps.values.statusCode ===
+                      ReviewWorkflowStatus.ContractInPlaceUnconditional &&
                       _.filter(cipUnconditionalTasks, { isCompleted: false, isOptional: false })
                         .length !== 0)
                   }
@@ -217,36 +179,22 @@ const SurplusPropertyListForm = ({
               )}
 
               <div className="col-md-6">
-                <GenericModal
-                  size={subdivisions.length > 0 ? ModalSize.LARGE : ModalSize.MEDIUM}
-                  display={dispose}
-                  cancelButtonText="Close"
-                  okButtonText="Dispose Project"
-                  handleOk={(e: any) => {
-                    onClickDisposedExternally(e);
-                    setDispose(false);
-                  }}
-                  handleCancel={() => {
-                    setDispose(false);
-                  }}
-                  title="Really Dispose Project?"
-                  message={
-                    <>
-                      {disposeWarning}
-                      {subdivisions.length > 0 && (
-                        <>
-                          <hr></hr>
-                          <FloatCheck size={32} />
-                          <p className="mb-3">{disposeSubdivisionWarning}</p>
-                          <LinkList
-                            noItemsMessage="No Associated Parent Parcels"
-                            listItems={linkListItems}
-                          />
-                        </>
-                      )}
-                    </>
-                  }
-                />
+                {dispose && (
+                  <GenericModal
+                    display={dispose}
+                    cancelButtonText="Close"
+                    okButtonText="Dispose Project"
+                    handleOk={(e: any) => {
+                      onClickDisposedExternally(e);
+                      setDispose(false);
+                    }}
+                    handleCancel={() => {
+                      setDispose(false);
+                    }}
+                    title="Really Dispose Project?"
+                    message={disposeWarning}
+                  />
+                )}
               </div>
             </Form.Group>
           </Form.Row>
@@ -321,8 +269,8 @@ const SurplusPropertyListForm = ({
       <TasksForm tasks={cipConditionalTasks} />
       <TasksForm tasks={cipUnconditionalTasks} />
 
-      {(values.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional ||
-        values.statusCode === ReviewWorkflowStatus.ContractInPlaceUnconditional) && (
+      {(formikProps.values.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional ||
+        formikProps.values.statusCode === ReviewWorkflowStatus.ContractInPlaceUnconditional) && (
         <>
           <Form.Row>
             <h3>Dispose Externally</h3>
@@ -341,7 +289,7 @@ const SurplusPropertyListForm = ({
         </>
       )}
 
-      {values.statusCode === ReviewWorkflowStatus.PreMarketing && (
+      {formikProps.values.statusCode === ReviewWorkflowStatus.PreMarketing && (
         <>
           <Form.Row>
             <h3>Remove from SPL</h3>
@@ -397,7 +345,7 @@ const SurplusPropertyListForm = ({
         />
         <div className="col-md-6">
           <Button
-            disabled={isReadOnly || !values.transferredWithinGreOn}
+            disabled={isReadOnly || !formikProps.values.transferredWithinGreOn}
             onClick={onClickGreTransferred}
           >
             Update Property Information

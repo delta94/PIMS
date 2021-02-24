@@ -173,20 +173,20 @@ namespace Pims.Dal.Keycloak
         /// <summary>
         /// Updates the specified access request in the datasource. if the request is granted, update the associated user as well.
         /// </summary>
-        /// <param name="accessRequest"></param>
+        /// <param name="entity"></param>
         /// <exception type="KeyNotFoundException">Entity does not exist in the datasource.</exception>
         /// <returns></returns>
-        public async Task<Entity.AccessRequest> UpdateAccessRequestAsync(Entity.AccessRequest accessRequest)
+        public async Task<Entity.AccessRequest> UpdateAccessRequestAsync(Entity.AccessRequest entity)
         {
-            accessRequest.ThrowIfNull(nameof(accessRequest));
-            accessRequest.ThrowIfNull(nameof(accessRequest.UserId));
+            entity.ThrowIfNull(nameof(entity));
+            entity.ThrowIfNull(nameof(entity.UserId));
 
-            _user.ThrowIfNotAuthorized(Permissions.AdminUsers, Permissions.AgencyAdmin);
-            var existingAccessRequest = _pimsAdminService.User.GetAccessRequest(accessRequest.Id);
-            if (existingAccessRequest.Status != Entity.AccessRequestStatus.Approved && accessRequest.Status == Entity.AccessRequestStatus.Approved)
+            this._user.ThrowIfNotAuthorized(Permissions.AdminUsers, Permissions.AgencyAdmin);
+            var accessRequest = _pimsAdminService.User.GetAccessRequest(entity.Id);
+            if (accessRequest.Status != Entity.AccessRequestStatus.Approved && entity.Status == Entity.AccessRequestStatus.Approved)
             {
-                var user = _pimsAdminService.User.Get(existingAccessRequest.UserId);
-                accessRequest.Agencies.ForEach((accessRequestAgency) =>
+                var user = _pimsAdminService.User.Get(accessRequest.UserId);
+                entity.Agencies.ForEach((accessRequestAgency) =>
                 {
                     if (!user.Agencies.Any(a => a.AgencyId == accessRequestAgency.AgencyId))
                     {
@@ -197,7 +197,7 @@ namespace Pims.Dal.Keycloak
                         });
                     }
                 });
-                accessRequest.Roles.ForEach((accessRequestRole) =>
+                entity.Roles.ForEach((accessRequestRole) =>
                 {
                     if (!user.Roles.Any(r => r.RoleId == accessRequestRole.RoleId))
                     {
@@ -211,7 +211,7 @@ namespace Pims.Dal.Keycloak
                 await UpdateUserAsync(user);
             }
 
-            return _pimsAdminService.User.UpdateAccessRequest(accessRequest);
+            return _pimsAdminService.User.UpdateAccessRequest(entity);
         }
     }
     #endregion

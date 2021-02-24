@@ -471,7 +471,6 @@ const Table = <T extends object>(props: PropsWithChildren<TableProps<T>>): React
     props.canRowExpand,
     props.onRowClick,
     props.noRowsMessage,
-    props.columns,
     renderExpandRowStateButton,
     cellProps,
     expandedRows,
@@ -500,8 +499,8 @@ const Table = <T extends object>(props: PropsWithChildren<TableProps<T>>): React
               >
                 {actions => (
                   <>
-                    {filterable && (
-                      <div className={'th reset-filter svg-btn'}>
+                    <div className={'th reset-filter svg-btn'}>
+                      {filterable && (
                         <TooltipWrapper
                           toolTipId="properties-list-filter-reset-tooltip"
                           toolTip="Reset Filter"
@@ -526,10 +525,10 @@ const Table = <T extends object>(props: PropsWithChildren<TableProps<T>>): React
                             variant="secondary"
                             style={{ width: 20, height: 20 }}
                             icon={<FaUndo size={10} />}
-                          />
+                          ></Button>
                         </TooltipWrapper>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     {headerGroup.headers.map((column: ColumnInstanceWithProps<T>) => (
                       <div
                         {...(props.hideHeaders

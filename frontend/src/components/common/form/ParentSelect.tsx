@@ -118,7 +118,6 @@ export const ParentSelect: React.FC<IParentSelect> = ({
         }}
         multiple={enableMultiple}
         options={options}
-        maxResults={options.length}
         bsSize={'large'}
         filterBy={filterBy}
         getOptionByValue={enableMultiple ? (value: any) => value : getOptionByValue}

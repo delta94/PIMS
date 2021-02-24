@@ -19,28 +19,6 @@ export const getCurrentFiscal = (fiscals: IFiscal[], key: FiscalKeys) => {
   return _.find(fiscals, { fiscalYear: currentFiscal, key: key });
 };
 
-const currentYear = moment().year();
-
-/**
- * Get the most recent evaluation matching the current year and passed evaluation type.
- * @param evaluations a list of evaluations belonging to this project
- * @param key only return evaluations matching this key
- */
-export const getCurrentYearEvaluation = (
-  evaluations: IEvaluation[],
-  key: EvaluationKeys,
-): IEvaluation | undefined => {
-  const currentYearEvaluations = evaluations.filter((evaluation: IEvaluation) =>
-    moment(evaluation.date, 'YYYY-MM-DD').isSame(currentYear),
-  );
-  return getMostRecentEvaluation(currentYearEvaluations, key);
-};
-
-/**
- * Get the most recent evaluation matching the passed evaluation type.
- * @param evaluations a list of evaluations belonging to this project
- * @param key only return evaluations matching this key
- */
 export const getMostRecentEvaluation = (
   evaluations: IEvaluation[],
   key: EvaluationKeys,
@@ -97,9 +75,9 @@ export const toFlatProject = (project?: IApiProject) => {
   const flatProperties = project.properties.map(pp => {
     const apiProperty: IApiProperty = (pp.building ?? pp.parcel) as IApiProperty;
     const assessedLand = pp.parcel
-      ? getCurrentYearEvaluation(apiProperty.evaluations, EvaluationKeys.Assessed)
+      ? getMostRecentEvaluation(apiProperty.evaluations, EvaluationKeys.Assessed)
       : null;
-    const assessedBuilding = getCurrentYearEvaluation(
+    const assessedBuilding = getMostRecentEvaluation(
       apiProperty.evaluations,
       EvaluationKeys.Improvements,
     );
@@ -131,24 +109,23 @@ export const toFlatProject = (project?: IApiProject) => {
       administrativeArea: apiProperty.address?.administrativeArea ?? '',
       province: apiProperty.address?.province ?? '',
       postal: apiProperty.address?.postal ?? '',
-      assessedLand: (assessedLand?.value as number) ?? '',
+      assessedLand: (assessedLand?.value as number) ?? 0,
       assessedLandDate: assessedLand?.date,
       assessedLandFirm: assessedLand?.firm,
       assessedLandRowVersion: assessedLand?.rowVersion,
-      assessedBuilding: (assessedBuilding?.value as number) ?? '',
+      assessedBuilding: (assessedBuilding?.value as number) ?? 0,
       assessedBuildingDate: assessedBuilding?.date,
       assessedBuildingFirm: assessedBuilding?.firm,
       assessedBuildingRowVersion: assessedBuilding?.rowVersion,
-      netBook: (netBook?.value as number) ?? '',
+      netBook: (netBook?.value as number) ?? 0,
       netBookFiscalYear: netBook?.fiscalYear as number,
       netBookRowVersion: netBook?.rowVersion,
-      market: (market?.value as number) ?? '',
+      market: (market?.value as number) ?? 0,
       marketFiscalYear: market?.fiscalYear as number,
       marketRowVersion: market?.rowVersion,
-      propertyTypeId: !!pp?.parcel ? pp.parcel.propertyTypeId ?? 0 : 1,
+      propertyTypeId: pp.parcel ? 0 : 1,
       propertyType: pp.propertyType,
       landArea: apiProperty.landArea,
-      parcels: apiProperty.parcels ?? [],
     };
     return property;
   });
@@ -204,7 +181,6 @@ export const toApiProperty = (
 ): IApiProperty => {
   const apiProperty: IApiProperty = {
     id: property.id,
-    propertyTypeId: property.propertyTypeId,
     parcelId: isParcelOrSubdivision(property) ? property.id : undefined,
     buildingId: property.propertyTypeId === PropertyTypes.BUILDING ? property.id : undefined,
     pid: property.pid,

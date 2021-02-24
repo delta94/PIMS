@@ -126,11 +126,6 @@ const ProjectListView: React.FC<IProps> = ({ filterable, title, mode }) => {
     [setPageSize, setPageIndex],
   );
 
-  // the following claims are passed through to the columns in order to determine whether to display delete option
-  const isAdmin = keycloak.hasClaim(Claims.ADMIN_PROJECTS);
-  const projectEditClaim = keycloak.hasClaim(Claims.PROJECT_EDIT);
-  const user = `${keycloak.lastName}, ${keycloak.firstName}`;
-
   // Update internal state whenever the filter bar state changes
   const handleFilterChange = useCallback(
     (value: IProjectFilterState) => {
@@ -222,7 +217,6 @@ const ProjectListView: React.FC<IProps> = ({ filterable, title, mode }) => {
       project.status = projectStatuses.find((x: any) => x.name === project.status)!;
       await service.deleteProject(project);
       setData(data?.filter(p => p.projectNumber !== project.projectNumber));
-      setDeleteId(undefined);
     }
   };
 
@@ -352,11 +346,7 @@ const ProjectListView: React.FC<IProps> = ({ filterable, title, mode }) => {
         <Table<IProject>
           name="projectsTable"
           clickableTooltip="View Disposal Project details"
-          columns={
-            mode === PageMode.APPROVAL
-              ? columns()
-              : columns(initiateDelete, isAdmin, projectEditClaim, user)
-          }
+          columns={mode === PageMode.APPROVAL ? columns() : columns(initiateDelete)}
           data={data || []}
           loading={data === undefined}
           onRequestData={handleRequestData}

@@ -107,20 +107,13 @@ describe('ERP Approval Step', () => {
       expect(proceedToSplButton).toBeVisible();
       expect(proceedToSplButton).toBeDisabled();
     });
-    it('correct form fields are disabled', () => {
+    it('form fields are not disabled', () => {
       const { queryAllByRole } = render(getApprovalStep());
       const textboxes = queryAllByRole('textbox');
       textboxes.forEach(textbox => {
         expect(textbox).toBeVisible();
-        if (textbox.id.includes('Spl')) {
-          //only disabled textboxes are SPL related datepickers and erp emails text
-          expect(textbox).toBeDisabled();
-        } else {
-          if (textbox.id.includes('[22]')) {
-            expect(textbox).toBeDisabled();
-          } else {
-            expect(textbox).not.toBeDisabled();
-          }
+        if (!textbox.className.includes('date-picker') && textbox.id !== 'input-note') {
+          expect(textbox).not.toBeDisabled();
         }
       });
     });
@@ -149,7 +142,7 @@ describe('ERP Approval Step', () => {
       const proceedToSplButton = component.queryByText(/Not Included in the SPL/);
       expect(proceedToSplButton).toBeDisabled();
     });
-    it('form fields are disabled', () => {
+    it('form fields are not disabled', () => {
       const component = render(getApprovalStep());
       const textboxes = component.queryAllByRole('textbox');
       textboxes.forEach(textbox => {
@@ -190,20 +183,19 @@ describe('ERP Approval Step', () => {
       const proceedToSplButton = component.queryByText(/Not Included in the SPL/);
       expect(proceedToSplButton).toBeDisabled();
     });
-    it('correct form fields are disabled', () => {
+    it('form fields are not disabled', () => {
       const component = render(getApprovalStep(getStore(project)));
       const textboxes = component.queryAllByRole('textbox');
       textboxes.forEach(textbox => {
-        expect(textbox).toBeVisible();
-        if (textbox.id.includes('Spl')) {
-          //only disabled textboxes are SPL related datepickers and erp emails text
+        if (
+          textbox.id === 'datepicker-requestForSplReceivedOn' ||
+          textbox.id === 'datepicker-approvedForSplOn'
+        ) {
+          expect(textbox).toBeVisible();
           expect(textbox).toBeDisabled();
         } else {
-          if (textbox.id.includes('[22]')) {
-            expect(textbox).toBeDisabled();
-          } else {
-            expect(textbox).not.toBeDisabled();
-          }
+          expect(textbox).toBeVisible();
+          expect(textbox).not.toBeDisabled();
         }
       });
     });

@@ -80,7 +80,4 @@ export interface IPropertyQueryParams {
   all?: boolean;
   parcelId?: number;
   propertyType?: string;
-  inSurplusPropertyProgram?: boolean;
-  inEnhancedReferralProcess?: boolean;
-  bareLandOnly?: boolean;
 }

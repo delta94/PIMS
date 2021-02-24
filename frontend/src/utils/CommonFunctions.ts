@@ -52,16 +52,6 @@ export const toApiPaginateParams = (
   return apiPaginateParams;
 };
 
-/**
- * Converts the filter into a paginated filter.
- *
- * @template T
- * @param {number} page
- * @param {number} [quantity]
- * @param {(string | string[])} [sort]
- * @param {T} [filter]
- * @returns {IPaginateParams}
- */
 export const toFilteredApiPaginateParams = <T extends object = {}>(
   page: number,
   quantity?: number,

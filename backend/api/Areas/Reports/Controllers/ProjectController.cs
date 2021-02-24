@@ -17,7 +17,7 @@ using System;
 namespace Pims.Api.Areas.Reports.Controllers
 {
     /// <summary>
-    /// ProjectController class, provides endpoints for generating reports.
+    /// ReportController class, provides endpoints for generating reports.
     /// </summary>
     [Authorize]
     [ApiController]

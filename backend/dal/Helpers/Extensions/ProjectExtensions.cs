@@ -43,7 +43,6 @@ namespace Pims.Dal.Helpers.Extensions
                 .Include(p => p.TierLevel)
                 .Include(p => p.Risk)
                 .Include(p => p.Agency)
-                .Include(p => p.Workflow)
                 .Include(p => p.Agency).ThenInclude(a => a.Parent)
                 .Include(p => p.Notes)
                 .AsNoTracking();
@@ -289,9 +288,7 @@ namespace Pims.Dal.Helpers.Extensions
         /// <returns></returns>
         public static void DisposeProjectProperties(this PimsContext context, Entity.Project project)
         {
-            var disposed = context.PropertyClassifications.AsNoTracking().FirstOrDefault(c => c.Name == "Disposed") ?? throw new KeyNotFoundException("Classification 'Disposed' not found.");
-            var parentParcels = GetSubdivisionParentParcels(project);
-            DisposeSubdivisionParentParcels(context, parentParcels);
+            var disposed = context.PropertyClassifications.Find(4) ?? throw new KeyNotFoundException("Classification 'Disposed' not found.");
             project.Properties.ForEach(p =>
             {
                 switch (p.PropertyType)
@@ -300,8 +297,6 @@ namespace Pims.Dal.Helpers.Extensions
                         if (p.Parcel == null) throw new InvalidOperationException("Unable to update parcel status.");
                         p.Parcel.ClassificationId = disposed.Id;
                         p.Parcel.AgencyId = null;
-                        p.Parcel.PropertyTypeId = (int)PropertyTypes.Land; // all subdivisions should be transitioned to parcels after they are disposed.
-                        p.Parcel.Parcels.Clear(); // remove all references to parent parcels.
                         break;
                     case (Entity.PropertyTypes.Building):
                         if (p.Building == null) throw new InvalidOperationException("Unable to update building status.");
@@ -311,32 +306,6 @@ namespace Pims.Dal.Helpers.Extensions
                 }
                 context.Update(p);
             });
-
-        }
-
-        /// <summary>
-        /// Disposes parent parcels of subdivisions by setting the classification to subdivided
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="parentParcels"></param>
-        public static void DisposeSubdivisionParentParcels(this PimsContext context, IEnumerable<Parcel> parentParcels)
-        {
-            var subdivided = context.PropertyClassifications.AsNoTracking().FirstOrDefault(c => c.Name == "Subdivided") ?? throw new KeyNotFoundException("Classification 'Subdivided' not found.");
-            parentParcels.ForEach(parentParcel =>
-            {
-                parentParcel.ClassificationId = subdivided.Id;
-                context.Update(parentParcel);
-            });
-        }
-
-        /// <summary>
-        /// Returns all parcels in project that contain at least one subdivision parcel (with an array of parent parcels).
-        /// </summary>
-        /// <param name="originalProject"></param>
-        public static IEnumerable<Entities.Parcel> GetSubdivisionParentParcels(this Entity.Project originalProject)
-        {
-            var projectParcels = originalProject.Properties.Select(p => p.Parcel).Where(p => p != null);
-            return projectParcels.SelectMany(pp => pp.Parcels).Where(p => p?.Parcel != null).Select(p => p.Parcel);
         }
 
         /// <summary>

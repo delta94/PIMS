@@ -26,7 +26,7 @@ import {
   parcelLayerPopupConfig,
   PARCELS_LAYER_URL,
 } from './LayerPopup/constants';
-import { isEmpty, isEqual, isEqualWith } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import {
   LayerPopupContent,
   LayerPopupTitle,
@@ -61,6 +61,7 @@ export type MapProps = {
   zoom?: number;
   properties: IProperty[];
   agencies: ILookupCode[];
+  propertyClassifications: ILookupCode[];
   administrativeAreas: ILookupCode[];
   lotSizes: number[];
   mapRef: React.RefObject<ReactLeafletMap<LeafletMapProps, LeafletMap>>;
@@ -103,26 +104,6 @@ const defaultFilterValues: IPropertyFilter = {
   surplusFilter: false,
 };
 
-const whitelistedFilterKeys = [
-  'pid',
-  'address',
-  'administrativeArea',
-  'projectNumber',
-  'classificationId',
-  'agencies',
-  'minLandArea',
-  'maxLandArea',
-  'rentableArea',
-  'inSurplusPropertyProgram',
-  'inEnhancedReferralProcess',
-  'name',
-  'predominateUseId',
-  'constructionTypeId',
-  'floorCount',
-  'bareLandOnly',
-  'includeAllProperties',
-];
-
 /**
  * Converts the map filter to a geo search filter.
  * @param filter The map filter.
@@ -160,6 +141,7 @@ const Map: React.FC<MapProps> = ({
   lng,
   zoom: zoomProp,
   agencies,
+  propertyClassifications,
   administrativeAreas,
   lotSizes,
   selectedProperty,
@@ -233,15 +215,8 @@ const Map: React.FC<MapProps> = ({
   }, [interactive, mapRef]);
 
   const handleMapFilterChange = async (filter: IPropertyFilter) => {
-    const compareValues = (objValue: any, othValue: any) => {
-      return whitelistedFilterKeys.reduce((acc, key) => {
-        return (isEqual(objValue[key], othValue[key]) || (!objValue[key] && !othValue[key])) && acc;
-      }, true);
-    };
-    if (!isEqualWith(geoFilter, filter, compareValues)) {
-      setGeoFilter(getQueryParams(filter));
-      setChanged(true);
-    }
+    setGeoFilter(getQueryParams(filter));
+    setChanged(true);
   };
 
   const handleBasemapToggle = (e: BasemapToggleEvent) => {
@@ -337,6 +312,7 @@ const Map: React.FC<MapProps> = ({
                     }}
                     agencyLookupCodes={agencies}
                     adminAreaLookupCodes={administrativeAreas}
+                    propertyClassifications={propertyClassifications}
                     onChange={handleMapFilterChange}
                     showAllAgencySelect={true}
                   />

@@ -34,7 +34,7 @@ const CloseOutFormTab: React.FunctionComponent<ICloseOutFormTabProps> = ({
       <h3>OCG</h3>
       <Form.Row>
         <Col>
-          <Form.Row className="col-md-11 p-0">
+          <Form.Row>
             <Form.Label column md={2}>
               OCG Gain / Loss
             </Form.Label>

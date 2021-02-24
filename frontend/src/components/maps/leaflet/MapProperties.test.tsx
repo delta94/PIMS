@@ -63,7 +63,6 @@ const mockDetails: IParcelDetail = {
     classification: 'Core Operational',
     description: 'test',
     isSensitive: false,
-    parcels: [],
     evaluations: [
       {
         date: '2019',

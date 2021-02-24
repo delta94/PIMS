@@ -72,7 +72,7 @@ export const columns: any[] = [
   {
     Header: 'CMV',
     accessor: 'market',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -83,7 +83,7 @@ export const columns: any[] = [
   {
     Header: 'NBV',
     accessor: 'netBook',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -94,7 +94,7 @@ export const columns: any[] = [
   {
     Header: 'Sales Cost',
     accessor: 'salesCost',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -105,7 +105,7 @@ export const columns: any[] = [
   {
     Header: 'Program Cost',
     accessor: 'programCost',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -116,7 +116,7 @@ export const columns: any[] = [
   {
     Header: 'Gain Loss',
     accessor: 'gainLoss',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -127,7 +127,7 @@ export const columns: any[] = [
   {
     Header: 'OCG Fin. Stmts.',
     accessor: 'ocgFinancialStatements',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -138,7 +138,7 @@ export const columns: any[] = [
   {
     Header: 'Interest Comp.',
     accessor: 'interestComponent',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -149,7 +149,7 @@ export const columns: any[] = [
   {
     Header: 'Net Proceeds',
     accessor: 'netProceeds',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,
@@ -160,7 +160,7 @@ export const columns: any[] = [
   {
     Header: 'Baseline Integrity',
     accessor: 'baselineIntegrity',
-    align: 'left',
+    align: 'right',
     responsive: true,
     width: spacing.small,
     minWidth: 80,

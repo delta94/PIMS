@@ -35,15 +35,6 @@ namespace Pims.Dal.Services.Admin
 
         #region Methods
         /// <summary>
-        /// Get the total number of user accounts.
-        /// </summary>
-        /// <returns></returns>
-        public int Count()
-        {
-            return this.Context.Users.Count();
-        }
-
-        /// <summary>
         /// Get a page of users from the datasource.
         /// The filter will allow queries to search for anything that starts with the following properties; DisplayName, FirstName, LastName, Email, Agencies.
         /// </summary>
@@ -66,11 +57,10 @@ namespace Pims.Dal.Services.Admin
             this.User.ThrowIfNotAuthorized(Permissions.AdminUsers);
 
             var query = this.Context.Users
-                .Include(u => u.Agencies).ThenInclude(a => a.Agency)
-                .Include(u => u.Roles).ThenInclude(r => r.Role)
-                .Include(u => u.CreatedBy)
-                .Include(u => u.UpdatedBy)
-                .Include(u => u.ApprovedBy)
+                .Include(u => u.Agencies)
+                .ThenInclude(a => a.Agency)
+                .Include(r => r.Roles)
+                .ThenInclude(r => r.Role)
                 .AsNoTracking()
                 .Where(u => !u.IsSystem);
 
@@ -151,109 +141,88 @@ namespace Pims.Dal.Services.Admin
         /// <summary>
         /// Add the specified user to the datasource.
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public override void Add(User user)
+        public override void Add(User entity)
         {
-            user.ThrowIfNull(nameof(user));
+            entity.ThrowIfNull(nameof(entity));
 
-            user.Roles.ForEach(r => this.Context.Entry(r).State = EntityState.Added);
-            user.Agencies.ForEach(a => this.Context.Entry(a).State = EntityState.Added);
+            entity.Roles.ForEach(r => this.Context.Entry(r).State = EntityState.Added);
+            entity.Agencies.ForEach(a => this.Context.Entry(a).State = EntityState.Added);
 
-            base.Add(user);
-            this.Context.Detach(user);
+            base.Add(entity);
+            this.Context.Detach(entity);
         }
 
         /// <summary>
         /// Updates the specified user in the datasource.
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="entity"></param>
         /// <exception type="KeyNotFoundException">Entity does not exist in the datasource.</exception>
         /// <returns></returns>
-        public override void Update(User user)
+        public override void Update(User entity)
         {
-            user.ThrowIfNull(nameof(user));
+            entity.ThrowIfNull(nameof(entity));
 
-            var existingUser = this.Context.Users
+            var user = this.Context.Users
                 .Include(u => u.Agencies)
                 .Include(u => u.Roles)
                 .AsNoTracking()
-                .FirstOrDefault(u => u.Id == user.Id) ?? throw new KeyNotFoundException();
+                .FirstOrDefault(u => u.Id == entity.Id) ?? throw new KeyNotFoundException();
 
-            this.Context.SetOriginalRowVersion(existingUser);
+            this.Context.SetOriginalRowVersion(user);
 
-            if (!existingUser.Agencies.Any())
-            {
-                user.ApprovedById = this.User.GetUserId();
-                user.ApprovedOn = DateTime.UtcNow;
-            }
-
-            var addRoles = user.Roles.Except(existingUser.Roles, new UserRoleRoleIdComparer());
+            var addRoles = entity.Roles.Except(user.Roles, new UserRoleRoleIdComparer());
             addRoles.ForEach(r => this.Context.Entry(r).State = EntityState.Added);
-            var removeRoles = existingUser.Roles.Except(user.Roles, new UserRoleRoleIdComparer());
+            var removeRoles = user.Roles.Except(entity.Roles, new UserRoleRoleIdComparer());
             removeRoles.ForEach(r => this.Context.Entry(r).State = EntityState.Deleted);
 
-            var addAgencies = user.Agencies.Except(existingUser.Agencies, new UserAgencyAgencyIdComparer());
+            var addAgencies = entity.Agencies.Except(user.Agencies, new UserAgencyAgencyIdComparer());
             addAgencies.ForEach(a => this.Context.Entry(a).State = EntityState.Added);
-            var removeAgencies = existingUser.Agencies.Except(user.Agencies, new UserAgencyAgencyIdComparer());
+            var removeAgencies = user.Agencies.Except(entity.Agencies, new UserAgencyAgencyIdComparer());
             removeAgencies.ForEach(a => this.Context.Entry(a).State = EntityState.Deleted);
 
-            base.Update(user);
-            this.Context.Detach(user);
+            base.Update(entity);
+            this.Context.Detach(entity);
         }
 
         /// <summary>
         /// Remove the specified user from the datasource.
         /// </summary>
         /// <exception type="KeyNotFoundException">Entity does not exist in the datasource.</exception>
-        /// <param name="user"></param>
-        public override void Remove(User user)
+        /// <param name="entity"></param>
+        public override void Remove(User entity)
         {
-            user.ThrowIfNull(nameof(user));
+            entity.ThrowIfNull(nameof(entity));
 
-            var existingUser = this.Context.Users
+            var user = this.Context.Users
                 .Include(u => u.Agencies)
                 .Include(u => u.Roles)
                 .AsNoTracking()
-                .FirstOrDefault(u => u.Id == user.Id) ?? throw new KeyNotFoundException();
+                .FirstOrDefault(u => u.Id == entity.Id) ?? throw new KeyNotFoundException();
 
-            this.Context.SetOriginalRowVersion(existingUser);
+            this.Context.SetOriginalRowVersion(user);
 
-            existingUser.Roles.Clear();
-            existingUser.Agencies.Clear();
+            user.Roles.Clear();
+            user.Agencies.Clear();
 
-            base.Remove(existingUser);
+            base.Remove(user);
         }
 
         /// <summary>
         /// Update the database using the passed AccessRequest
         /// </summary>
-        /// <param name="accessRequest"></param>
-        public AccessRequest UpdateAccessRequest(AccessRequest accessRequest)
+        /// <param name="entity"></param>
+        public AccessRequest UpdateAccessRequest(AccessRequest entity)
         {
-            var existingAccessRequest = GetAccessRequest(accessRequest.Id);
-            this.Context.SetOriginalRowVersion(existingAccessRequest);
-
-            var isApproving = accessRequest.Status == AccessRequestStatus.Approved && existingAccessRequest.Status != AccessRequestStatus.Approved;
-
-            existingAccessRequest.Note = accessRequest.Note;
-            existingAccessRequest.Status = accessRequest.Status;
-            existingAccessRequest.Roles.Clear();
-            accessRequest.Roles.ForEach(r => existingAccessRequest.Roles.Add(new AccessRequestRole(existingAccessRequest.Id, r.RoleId)));
-            existingAccessRequest.Agencies.Clear();
-            accessRequest.Agencies.ForEach(a => existingAccessRequest.Agencies.Add(new AccessRequestAgency(existingAccessRequest.Id, a.AgencyId)));
-
-            if (isApproving)
-            {
-                var approvedUser = this.Context.Users.Find(existingAccessRequest.UserId);
-                approvedUser.ApprovedById = this.User.GetUserId();
-                approvedUser.ApprovedOn = DateTime.UtcNow;
-                this.Context.Users.Update(approvedUser);
-            }
-
-            Context.Entry(existingAccessRequest).State = EntityState.Modified;
+            var accessRequest = GetAccessRequest(entity.Id);
+            entity.UpdatedById = this.User.GetUserId(); // TODO: No longer needed.
+            entity.UpdatedOn = DateTime.UtcNow;
+            this.Context.Entry(accessRequest).CurrentValues.SetValues(entity);
+            accessRequest.UserId = accessRequest.User.Id;
+            Context.Entry(accessRequest).State = EntityState.Modified;
             this.Context.CommitTransaction();
-            return accessRequest;
+            return entity;
         }
 
         /// <summary>

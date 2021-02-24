@@ -113,14 +113,12 @@ export const ParcelIdentificationForm: React.FC<IIdentificationProps> = ({
           <h5>Parcel Details</h5>
         </Col>
         <Col md={6}>
-          {propertyTypeId !== PropertyTypes.SUBDIVISION && (
-            <PidPinForm
-              nameSpace={nameSpace}
-              handlePidChange={noop}
-              handlePinChange={noop}
-              disabled={disabled}
-            />
-          )}
+          <PidPinForm
+            nameSpace={nameSpace}
+            handlePidChange={noop}
+            handlePinChange={noop}
+            disabled={disabled}
+          />
           <AddressForm
             onGeocoderChange={(selection: IGeocoderResponse) => {
               const administrativeArea = selection.administrativeArea

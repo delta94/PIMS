@@ -143,19 +143,11 @@ const SplStep = ({ formikRef }: IStepProps) => {
   const canUserEdit =
     canUserOverride() ||
     (canUserApproveForm() &&
-      _.includes(
-        [
-          ReviewWorkflowStatus.ApprovedForSpl,
-          ReviewWorkflowStatus.PreMarketing,
-          ReviewWorkflowStatus.OnMarket,
-          ReviewWorkflowStatus.ContractInPlaceConditional,
-          ReviewWorkflowStatus.ContractInPlaceUnconditional,
-          ReviewWorkflowStatus.NotInSpl,
-        ],
-        project?.statusCode,
-      )) ||
-    currentTab === SPPApprovalTabs.closeOutForm;
-
+      (project?.statusCode === ReviewWorkflowStatus.ApprovedForSpl ||
+        project?.statusCode === ReviewWorkflowStatus.PreMarketing ||
+        project?.statusCode === ReviewWorkflowStatus.OnMarket ||
+        project?.statusCode === ReviewWorkflowStatus.ContractInPlaceConditional ||
+        currentTab === SPPApprovalTabs.closeOutForm));
   const setCurrentTab = (tabName: string) => {
     dispatch(saveSplTab(tabName));
   };

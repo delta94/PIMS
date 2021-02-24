@@ -2433,12 +2433,6 @@ namespace Pims.Dal.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ApprovedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ApprovedOn")
-                        .HasColumnType("DATETIME2");
-
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
@@ -2476,7 +2470,7 @@ namespace Pims.Dal.Migrations
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("DATETIME2");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -2512,8 +2506,6 @@ namespace Pims.Dal.Migrations
                         .HasMaxLength(25);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CreatedById");
 
@@ -2954,8 +2946,7 @@ namespace Pims.Dal.Migrations
 
                     b.HasOne("Pims.Dal.Entities.Project", "Project")
                         .WithMany("Notifications")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.ClientCascade);
+                        .HasForeignKey("ProjectId");
 
                     b.HasOne("Pims.Dal.Entities.NotificationTemplate", "Template")
                         .WithMany("Notifications")
@@ -3432,10 +3423,6 @@ namespace Pims.Dal.Migrations
 
             modelBuilder.Entity("Pims.Dal.Entities.User", b =>
                 {
-                    b.HasOne("Pims.Dal.Entities.User", "ApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("ApprovedById");
-
                     b.HasOne("Pims.Dal.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
