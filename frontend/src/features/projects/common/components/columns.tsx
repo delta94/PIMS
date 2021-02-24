@@ -30,7 +30,7 @@ const sumFinancialRows = (properties: IProperty[], key: string): string => {
 };
 
 const getEditableClassificationCell = (limitLabels?: string[]) => (cellInfo: any) => {
-  const classifications = useCodeLookups().getOptionsByType('PropertyClassification');
+  const classifications = useCodeLookups().getPropertyClassificationOptions();
   const context = useFormikContext();
   return (
     <FastSelect
@@ -252,7 +252,9 @@ export const getPropertyColumns = ({
     {
       Header: 'Assessed Value',
       accessor: (row: IProperty) =>
-        row.propertyTypeId === PropertyTypes.PARCEL ? row.assessedLand : row.assessedBuilding,
+        [PropertyTypes.PARCEL, PropertyTypes.SUBDIVISION].includes(row.propertyTypeId)
+          ? row.assessedLand
+          : row.assessedBuilding,
       Cell: editableFinancials ? EditableMoneyCell : MoneyCell,
       minWidth: 145,
       align: 'left',

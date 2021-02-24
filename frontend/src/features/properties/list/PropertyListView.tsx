@@ -89,6 +89,7 @@ const defaultFilterValues: IPropertyFilter = {
   maxAssessedValue: '',
   maxNetBookValue: '',
   maxMarketValue: '',
+  surplusFilter: false,
 };
 
 export const flattenProperty = (apiProperty: IApiProperty): IProperty => {
@@ -159,6 +160,9 @@ const getServerQuery = (state: {
       administrativeArea,
       projectNumber,
       classificationId,
+      inSurplusPropertyProgram,
+      inEnhancedReferralProcess,
+      bareLandOnly,
       name,
       agencies,
       minLotSize,
@@ -186,6 +190,9 @@ const getServerQuery = (state: {
     agencies: parsedAgencies,
     minLandArea: decimalOrUndefined(minLotSize),
     maxLandArea: decimalOrUndefined(maxLotSize),
+    inSurplusPropertyProgram: inSurplusPropertyProgram,
+    inEnhancedReferralProcess: inEnhancedReferralProcess,
+    bareLandOnly: bareLandOnly,
     page: pageIndex + 1,
     quantity: pageSize,
     propertyType: propertyType,
@@ -240,10 +247,9 @@ const PropertyListView: React.FC = () => {
   const agenciesList = agencies.filter(a => !a.parentId).map(mapLookupCode);
   const subAgencies = agencies.filter(a => !!a.parentId).map(mapLookupCode);
 
-  const propertyClassifications = useMemo(
-    () => lookupCodes.getByType(API.PROPERTY_CLASSIFICATION_CODE_SET_NAME),
-    [lookupCodes],
-  );
+  const propertyClassifications = useMemo(() => lookupCodes.getPropertyClassificationOptions(), [
+    lookupCodes,
+  ]);
   const administrativeAreas = useMemo(
     () => lookupCodes.getByType(API.AMINISTRATIVE_AREA_CODE_SET_NAME),
     [lookupCodes],
@@ -421,7 +427,6 @@ const PropertyListView: React.FC = () => {
           <PropertyFilter
             defaultFilter={defaultFilterValues}
             agencyLookupCodes={agencies}
-            propertyClassifications={propertyClassifications}
             adminAreaLookupCodes={administrativeAreas}
             onChange={handleFilterChange}
             sort={sorting}
@@ -536,7 +541,7 @@ const PropertyListView: React.FC = () => {
                 });
               }
 
-              toast.info('Successfully saved changes!!');
+              toast.info('Successfully saved changes');
               setDirtyRows([]);
               setData(nextProperties);
             }

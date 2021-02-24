@@ -375,9 +375,6 @@ exports[`Review Approve Step renders correctly 1`] = `
                 style="display: flex; flex: 1 0 auto; min-width: 645px;"
               >
                 <div
-                  class="th reset-filter svg-btn"
-                />
-                <div
                   class="th"
                   colspan="1"
                   role="columnheader"
@@ -944,8 +941,7 @@ exports[`Review Approve Step renders correctly 1`] = `
             class="form-label"
             for="input-confirmation"
           >
-            My Ministry/Agency has received approval to request the property be submitted to the Enhanced Referral Program and marketed internally to other Ministry 
-  and Broader Public Sector Agencies for 90 days before listing the property to be sold on the public commercial real estate market
+            My Ministry/Agency has approval/authority to submit the Disposal Project to SRES for review.
           </label>
         </div>
       </div>

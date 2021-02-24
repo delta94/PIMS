@@ -462,9 +462,6 @@ exports[`Review Summary View renders approved correctly 1`] = `
                 }
               >
                 <div
-                  className="th reset-filter svg-btn"
-                />
-                <div
                   className="th"
                   colSpan={1}
                   role="columnheader"
@@ -813,8 +810,7 @@ exports[`Review Summary View renders approved correctly 1`] = `
             className="form-label"
             htmlFor="input-confirmation"
           >
-            My Ministry/Agency has received approval to request the property be submitted to the Enhanced Referral Program and marketed internally to other Ministry 
-  and Broader Public Sector Agencies for 90 days before listing the property to be sold on the public commercial real estate market
+            My Ministry/Agency has approval/authority to submit the Disposal Project to SRES for review.
           </label>
         </div>
       </div>
@@ -1451,9 +1447,6 @@ exports[`Review Summary View renders denied correctly 1`] = `
                 }
               >
                 <div
-                  className="th reset-filter svg-btn"
-                />
-                <div
                   className="th"
                   colSpan={1}
                   role="columnheader"
@@ -1802,8 +1795,7 @@ exports[`Review Summary View renders denied correctly 1`] = `
             className="form-label"
             htmlFor="input-confirmation"
           >
-            My Ministry/Agency has received approval to request the property be submitted to the Enhanced Referral Program and marketed internally to other Ministry 
-  and Broader Public Sector Agencies for 90 days before listing the property to be sold on the public commercial real estate market
+            My Ministry/Agency has approval/authority to submit the Disposal Project to SRES for review.
           </label>
         </div>
       </div>
@@ -2440,9 +2432,6 @@ exports[`Review Summary View renders submitted correctly 1`] = `
                 }
               >
                 <div
-                  className="th reset-filter svg-btn"
-                />
-                <div
                   className="th"
                   colSpan={1}
                   role="columnheader"
@@ -2791,8 +2780,7 @@ exports[`Review Summary View renders submitted correctly 1`] = `
             className="form-label"
             htmlFor="input-confirmation"
           >
-            My Ministry/Agency has received approval to request the property be submitted to the Enhanced Referral Program and marketed internally to other Ministry 
-  and Broader Public Sector Agencies for 90 days before listing the property to be sold on the public commercial real estate market
+            My Ministry/Agency has approval/authority to submit the Disposal Project to SRES for review.
           </label>
         </div>
       </div>

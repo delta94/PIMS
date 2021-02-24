@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { ThreeColumnItem } from './ThreeColumnItem';
 import variables from '_variables.module.scss';
 import { PropertyTypes } from 'constants/propertyTypes';
+import useCodeLookups from 'hooks/useLookupCodes';
 
 /**
  * Compare two dates to evaluation which is earlier.
@@ -77,13 +78,17 @@ export const InfoContent: React.FC<IInfoContent> = ({
   propertyTypeId,
   canViewDetails,
 }) => {
+  const isParcel =
+    propertyTypeId !== null &&
+    [PropertyTypes.PARCEL, PropertyTypes.SUBDIVISION].includes(propertyTypeId);
+
+  const lookupCodes = useCodeLookups();
+
   return (
     <>
       <ListGroup>
         <Label className="header">{getHeading(propertyTypeId)}</Label>
-        {propertyTypeId === PropertyTypes.PARCEL && (
-          <ParcelPIDPIN parcelInfo={propertyInfo as IParcel} />
-        )}
+        {isParcel && <ParcelPIDPIN parcelInfo={propertyInfo as IParcel} />}
         <OuterRow>
           {canViewDetails && (
             <>
@@ -94,17 +99,17 @@ export const InfoContent: React.FC<IInfoContent> = ({
                 <>
                   <ThreeColumnItem
                     leftSideLabel={'Ministry'}
-                    rightSideItem={propertyInfo?.agency}
+                    rightSideItem={lookupCodes.getAgencyFullName(propertyInfo?.agency)}
                   />
                   <ThreeColumnItem
                     leftSideLabel={'Owning agency'}
-                    rightSideItem={propertyInfo.subAgency}
+                    rightSideItem={lookupCodes.getAgencyFullName(propertyInfo.subAgency)}
                   />
                 </>
               ) : (
                 <ThreeColumnItem
                   leftSideLabel={'Owning ministry'}
-                  rightSideItem={propertyInfo?.agency}
+                  rightSideItem={lookupCodes.getAgencyFullName(propertyInfo?.agency)}
                 />
               )}
             </>
@@ -142,7 +147,7 @@ export const InfoContent: React.FC<IInfoContent> = ({
           <ThreeColumnItem leftSideLabel={'Longitude'} rightSideItem={propertyInfo?.longitude} />
         </OuterRow>
       </ListGroup>
-      {propertyTypeId === PropertyTypes.PARCEL && (
+      {isParcel && (
         <ParcelAttributes parcelInfo={propertyInfo as IParcel} canViewDetails={canViewDetails} />
       )}
       {propertyTypeId === PropertyTypes.BUILDING && (
